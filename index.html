@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracking App</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="manifest" href="/manifest.json">
+</head>
+<body class="font-display bg-background-light">
+
+<div id="app"></div>
+
+<script type="module">
+    const { createApp, ref, computed } = Vue;
+
+    // --- MOCK DATA ---
+    const mockMachines = [
+        { id: 1, name: 'CNC-Mill-001', status: 'Online', location: 'New York, USA', lastCheckin: '2 minutes ago', details: { assetId: 'ASSET-001', serial: 'SN-111', temp: 75, status: 'Active' } },
+        { id: 2, name: 'Laser-Cutter-003', status: 'Offline', location: 'London, UK', lastCheckin: '3 hours ago', details: { assetId: 'ASSET-002', serial: 'SN-222', temp: 0, status: 'Offline' } },
+        { id: 3, name: '3D-Printer-005', status: 'Warning', location: 'Tokyo, Japan', lastCheckin: '15 minutes ago', details: { assetId: 'ASSET-003', serial: 'SN-333', temp: 95, status: 'In Maintenance' } }
+    ];
+
+    // --- COMPONENTS ---
+
+    // Screen 1 & 7: OTP Login Flow
+    const OtpLoginComponent = {
+        template: `
+            <div class="relative flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 p-4">
+                <!-- Email Entry -->
+                <div v-if="!otpSent" class="w-full max-w-md">
+                    <div class="flex justify-center mb-6"><svg class="h-10 w-auto text-[#137fec]" fill="none" viewBox="0 0 48 48"><path d="M24 6L10 14V30L24 38L38 30V14L24 6Z" stroke="currentColor" stroke-width="4"></path><path d="M10 14L24 22L38 14" stroke="currentColor" stroke-width="4"></path><path d="M24 38V22" stroke="currentColor" stroke-width="4"></path></svg></div>
+                    <div class="flex flex-col gap-4 rounded-xl border bg-white shadow-sm p-8">
+                        <div class="text-center">
+                            <h1 class="text-3xl font-bold">Welcome</h1>
+                            <p class="text-gray-600 mt-2">Enter your email to receive a login code.</p>
+                        </div>
+                        <form @submit.prevent="sendOtp" class="flex flex-col gap-6 mt-4">
+                            <label class="flex flex-col"><p class="pb-2 text-base font-medium">Email</p><input v-model="email" type="email" class="form-input h-14 rounded-lg border px-3" placeholder="Enter your email address" required></label>
+                            <button type="submit" class="h-14 rounded-lg bg-[#137fec] text-white font-medium hover:bg-opacity-90">Get Login Code</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- OTP Modal -->
+                <div v-if="otpSent" class="relative flex w-full max-w-md flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+                     <div class="flex flex-col items-center justify-center p-8 sm:p-10">
+                        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-[#137fec]"><span class="material-symbols-outlined text-4xl">shield</span></div>
+                        <h1 class="text-2xl font-bold text-center pb-2">Verify Your Identity</h1>
+                        <p class="text-gray-600 text-sm text-center pb-6">We've sent a verification code to <strong>{{ email }}</strong>.</p>
+                        <form @submit.prevent="verifyOtp" class="flex flex-col gap-6 w-full">
+                            <div class="flex justify-center gap-2">
+                                <input v-for="(digit, index) in otp" :key="index" v-model="otp[index]" type="text" maxlength="1" @input="handleOtpInput(index, $event)" ref="otpInputs" class="h-14 w-12 text-center text-2xl font-bold rounded-lg border focus:border-[#137fec] focus:ring-2 focus:ring-[#137fec]/50">
+                            </div>
+                            <button type="submit" class="h-14 rounded-lg bg-[#137fec] text-white font-medium hover:bg-opacity-90">Verify & Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `,
+        setup(_, { emit }) {
+            const email = ref('');
+            const otpSent = ref(false);
+            const otp = ref(['', '', '', '', '', '']);
+            const otpInputs = ref([]);
+
+            const sendOtp = () => {
+                if (email.value) {
+                    console.log('Sending OTP to', email.value);
+                    otpSent.value = true;
+                }
+            };
+
+            const verifyOtp = () => {
+                const code = otp.value.join('');
+                if (code.length === 6) {
+                    console.log('Verifying OTP', code);
+                    // Mock verification
+                    emit('login-success');
+                } else {
+                    alert('Please enter the 6-digit code.');
+                }
+            };
+
+            const handleOtpInput = (index, event) => {
+                const value = event.target.value;
+                if (value.length === 1 && index < otp.value.length - 1) {
+                    otpInputs.value[index + 1].focus();
+                }
+            };
+
+            return { email, otpSent, otp, otpInputs, sendOtp, verifyOtp, handleOtpInput };
+        }
+    };
+
+    // Screen 2: Dashboard View
+    const DashboardComponent = {
+        template: `
+            <div class="relative flex min-h-screen w-full">
+                <!-- SideNavBar -->
+                <aside class="flex h-screen w-64 flex-col border-r bg-white sticky top-0">
+                    <div class="flex h-16 items-center gap-3 px-6 border-b">
+                        <svg class="size-8 text-[#4A90E2]" fill="none" viewBox="0 0 48 48"><path d="M39.5 34.1V13.8C39.5 15.7 36.8 17.3 32.7 18.3C30.2 18.9 27.2 19.2 24 19.2S17.7 18.9 15.2 18.3C11.1 17.3 8.4 15.7 8.4 13.8V34.1C8.4 36 11.1 37.6 15.2 38.6C17.7 39.2 20.7 39.5 24 39.5S30.2 39.2 32.7 38.6C36.8 37.6 39.5 36 39.5 34.1Z" fill="currentColor"></path></svg>
+                        <h2 class="text-lg font-bold">Machine Manager</h2>
+                    </div>
+                    <div class="flex flex-1 flex-col justify-between p-4">
+                        <nav class="flex flex-col gap-2">
+                            <a href="#" class="flex items-center gap-3 rounded-lg bg-primary/20 px-3 py-2 text-[#4A90E2]"><span class="material-symbols-outlined">dashboard</span><p>Dashboard</p></a>
+                            <!-- Add other nav links as needed -->
+                        </nav>
+                        <a @click="$emit('logout')" href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-black/5"><span class="material-symbols-outlined">logout</span><p>Logout</p></a>
+                    </div>
+                </aside>
+                <main class="flex-1">
+                    <header class="flex items-center justify-end border-b px-8 py-3 sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+                        <button class="h-10 px-4 rounded-lg bg-[#4A90E2] text-white text-sm font-bold shadow-sm hover:bg-opacity-90">Request Service</button>
+                    </header>
+                    <div class="p-8">
+                        <div class="mx-auto max-w-7xl">
+                            <h1 class="text-3xl font-bold mb-8">My Machines Dashboard</h1>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="rounded-lg p-6 border bg-white"><p>Total Machines</p><p class="text-4xl font-bold">3</p></div>
+                                <div class="rounded-lg p-6 border bg-white"><p>Active Machines</p><p class="text-4xl font-bold">1</p></div>
+                                <div class="rounded-lg p-6 border bg-white"><p>Machines with Alerts</p><p class="text-4xl font-bold text-amber-500">1</p></div>
+                            </div>
+                            <div class="overflow-x-auto rounded-lg border bg-white">
+                                <table class="w-full text-left">
+                                    <thead><tr class="bg-gray-50"><th class="p-4">Machine Name</th><th>Status</th><th>Actions</th></tr></thead>
+                                    <tbody>
+                                        <tr v-for="machine in machines" :key="machine.id" class="border-t">
+                                            <td class="p-4 font-semibold">{{ machine.name }}</td>
+                                            <td><span :class="statusClass(machine.status)">{{ machine.status }}</span></td>
+                                            <td><button @click="$emit('view-details', machine)" class="text-sm font-semibold text-[#4A90E2] hover:underline">View Details</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        `,
+        props: ['machines'],
+        setup() {
+            const statusClass = (status) => {
+                switch (status) {
+                    case 'Online': return 'bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium';
+                    case 'Offline': return 'bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-medium';
+                    case 'Warning': return 'bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium';
+                    default: return 'bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium';
+                }
+            };
+            return { statusClass };
+        }
+    };
+
+    // Screen 3: Details View
+    const DetailsComponent = {
+        template: `
+            <div class="relative flex min-h-screen w-full">
+                 <!-- SideNavBar (consistent with dashboard) -->
+                <aside class="flex h-screen w-64 flex-col border-r bg-white sticky top-0"><div class="flex h-16 items-center gap-3 px-6 border-b"><h2 class="text-lg font-bold">Machine Manager</h2></div><div class="p-4"><a href="#" @click="$emit('back-to-dashboard')" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-black/5"><span class="material-symbols-outlined">arrow_back</span><p>Back to Dashboard</p></a></div></aside>
+                <main class="flex-1 p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h1 class="text-3xl font-bold mb-8">Machine Details: {{ machine.name }}</h1>
+                        <div class="bg-white rounded-xl shadow-sm border p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div><p class="font-medium">Asset ID</p><p>{{ machine.details.assetId }}</p></div>
+                                <div><p class="font-medium">Serial Number</p><p>{{ machine.details.serial }}</p></div>
+                                <div><p class="font-medium">Operating Temperature</p><p>{{ machine.details.temp }}°C</p></div>
+                                <div><p class="font-medium">Status</p><p>{{ machine.details.status }}</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        `,
+        props: ['machine']
+    };
+
+
+    // --- Main App ---
+    const app = createApp({
+        setup() {
+            const currentView = ref('login'); // or 'dashboard', 'details'
+            const machines = ref(mockMachines);
+            const selectedMachine = ref(null);
+
+            const viewComponent = computed(() => {
+                switch (currentView.value) {
+                    case 'dashboard':
+                        return DashboardComponent;
+                    case 'details':
+                        return DetailsComponent;
+                    default:
+                        return OtpLoginComponent;
+                }
+            });
+
+            const currentProps = computed(() => {
+                switch (currentView.value) {
+                    case 'dashboard':
+                        return { machines: machines.value };
+                    case 'details':
+                        return { machine: selectedMachine.value };
+                    default:
+                        return {};
+                }
+            });
+
+            const showDashboard = () => {
+                currentView.value = 'dashboard';
+            };
+
+            const showDetails = (machine) => {
+                selectedMachine.value = machine;
+                currentView.value = 'details';
+            };
+
+            const logout = () => {
+                currentView.value = 'login';
+            };
+
+            return {
+                viewComponent,
+                currentProps,
+                showDashboard,
+                showDetails,
+                logout,
+            };
+        },
+        template: `
+            <component
+                :is="viewComponent"
+                v-bind="currentProps"
+                @login-success="showDashboard"
+                @view-details="showDetails"
+                @back-to-dashboard="showDashboard"
+                @logout="logout"
+            />
+        `
+    });
+
+    app.mount('#app');
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then(registration => {
+          console.log('SW registered: ', registration);
+        }).catch(registrationError => {
+          console.log('SW registration failed: ', registrationError);
+        });
+      });
+    }
+</script>
+
+</body>
+</html>
