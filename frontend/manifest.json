@@ -1,21 +1,13 @@
 {
-  "name": "Asset Tracker",
-  "short_name": "AssetTracker",
+  "name": "Asset Tracking App",
+  "short_name": "AssetApp",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#137fec",
-  "description": "An application to track and manage assets.",
-  "icons": [
-    {
-      "src": "https://via.placeholder.com/192",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  "background_color": "#fff",
+  "description": "A simple asset tracking app.",
+  "icons": [{
+    "src": "icon.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
 }

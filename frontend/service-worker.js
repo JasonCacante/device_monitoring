@@ -1,8 +1,10 @@
-const CACHE_NAME = 'asset-tracker-cache-v1';
+const CACHE_NAME = 'asset-tracking-app-cache-v1';
 const urlsToCache = [
   '/',
   '/index.html',
   'https://cdn.tailwindcss.com?plugins=forms,container-queries',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
+  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined',
   'https://unpkg.com/vue@3/dist/vue.global.js'
 ];
 
