@@ -1,16 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asset Tracking App</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="manifest" href="/manifest.json">
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4A90E2",
+              "background-light": "#F4F7FA",
+              "background-dark": "#101922",
+              "neutral-light": "#FFFFFF",
+              "neutral-dark": "#2D3748",
+              "text-light-primary": "#2D3748",
+              "text-dark-primary": "#F4F7FA",
+              "text-light-secondary": "#617589",
+              "text-dark-secondary": "#9CA3AF",
+              "border-light": "#dbe0e6",
+              "border-dark": "#3a4a5a",
+              "success": "#28A745",
+              "warning": "#FFC107",
+              "error": "#DC3545",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
 </head>
-<body class="font-display bg-background-light">
+<body class="font-display bg-background-light dark:bg-background-dark">
 
 <div id="app"></div>
 
@@ -19,43 +56,49 @@
 
     // --- MOCK DATA ---
     const mockMachines = [
-        { id: 1, name: 'CNC-Mill-001', status: 'Online', location: 'New York, USA', lastCheckin: '2 minutes ago', details: { assetId: 'ASSET-001', serial: 'SN-111', temp: 75, status: 'Active' } },
-        { id: 2, name: 'Laser-Cutter-003', status: 'Offline', location: 'London, UK', lastCheckin: '3 hours ago', details: { assetId: 'ASSET-002', serial: 'SN-222', temp: 0, status: 'Offline' } },
-        { id: 3, name: '3D-Printer-005', status: 'Warning', location: 'Tokyo, Japan', lastCheckin: '15 minutes ago', details: { assetId: 'ASSET-003', serial: 'SN-333', temp: 95, status: 'In Maintenance' } }
+        { id: 1, name: 'CNC-Mill-001', status: 'Online', location: 'New York, USA', lastCheckin: '2 minutes ago', type: 'Type A', assetId: 'ASSET-001', serial: 'SN-111', temp: 75, lastServiced: '2023-10-26', department: 'Manufacturing', notes: 'Replaced spindle motor.' },
+        { id: 2, name: 'Laser-Cutter-003', status: 'Offline', location: 'London, UK', lastCheckin: '3 hours ago', type: 'Type B', assetId: 'ASSET-002', serial: 'SN-222', temp: 0, lastServiced: '2023-09-15', department: 'Prototyping', notes: '' },
+        { id: 3, name: '3D-Printer-005', status: 'Warning', location: 'Tokyo, Japan', lastCheckin: '15 minutes ago', type: 'Type C', assetId: 'ASSET-003', serial: 'SN-333', temp: 95, lastServiced: '2023-10-01', department: 'R&D', notes: 'Extruder needs calibration.' },
+        { id: 4, name: 'Robotic-Arm-002', status: 'Maintenance', location: 'Berlin, Germany', lastCheckin: '1 day ago', type: 'Type A', assetId: 'ASSET-004', serial: 'SN-444', temp: 50, lastServiced: '2023-08-20', department: 'Assembly', notes: 'Scheduled maintenance.' },
+        { id: 5, name: 'Packaging-Unit-007', status: 'Online', location: 'Sydney, Australia', lastCheckin: '5 minutes ago', type: 'Type B', assetId: 'ASSET-005', serial: 'SN-555', temp: 65, lastServiced: '2023-10-10', department: 'Logistics', notes: '' },
+    ];
+    const mockUsers = [
+        { id: 1, name: 'Ana de Armas', email: 'ana.de.armas@email.com', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD8lGt2dCK96pla_51eFGHMdQCODsuUaNsdLiI7rDEbbUkHdtHCRl1GQMR6JJdsypVUFaMFs0eBGt1oE4wOxb5-jhwnAJ9uG--M3Dg8mwVdko13pWJyqbpsxiNzYOoqteXt4GZ0CiXe1pdLBW-mLWnJa5OPNIXt6GxGFVRxIvgSnNsZiKkRfoOnc65E-0dKlW1oKsSNp36_-GHXP9Al8BOxr1_OS4XP7K-3K7WdDBBSCqTsznb-Y4iM1Gd1gz5FHnlf189avQCgt6l5' },
+        { id: 2, name: 'John Doe', email: 'john.doe@email.com', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBChUXdb3Cuy3aMGlt9oUrlphjXILJThtN1XUPwlMFHr43W1hRJCeCvHyCX_jcI4mF1xt4hgpulvlm2wZqVAkirxtvaqUl6vRkkVmX8nnS8Ufkqf7n7D8M9PUsNxKRI15YZ103mgR-Y6icqoUV3L4-zsOkHsgtF7y-gVIOhV8fZs3D4n3n2-Upkp6KWKAiotoy0kxLqkvTqLvQBcu9P11vQKIQzQ6KLzisqXyW4c9OQV4fmpqBu9ut1qaMvwDfuf316ZPV41RdQAwyN' }
     ];
 
     // --- COMPONENTS ---
 
-    // Screen 1 & 7: OTP Login Flow
+    // Login Component
     const OtpLoginComponent = {
         template: `
-            <div class="relative flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 p-4">
+            <div class="relative flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 dark:bg-background-dark p-4">
                 <!-- Email Entry -->
                 <div v-if="!otpSent" class="w-full max-w-md">
-                    <div class="flex justify-center mb-6"><svg class="h-10 w-auto text-[#137fec]" fill="none" viewBox="0 0 48 48"><path d="M24 6L10 14V30L24 38L38 30V14L24 6Z" stroke="currentColor" stroke-width="4"></path><path d="M10 14L24 22L38 14" stroke="currentColor" stroke-width="4"></path><path d="M24 38V22" stroke="currentColor" stroke-width="4"></path></svg></div>
-                    <div class="flex flex-col gap-4 rounded-xl border bg-white shadow-sm p-8">
+                    <div class="flex justify-center mb-6"><svg class="h-10 w-auto text-primary" fill="none" viewBox="0 0 48 48"><path d="M24 6L10 14V30L24 38L38 30V14L24 6Z" stroke="currentColor" stroke-width="4"></path><path d="M10 14L24 22L38 14" stroke="currentColor" stroke-width="4"></path><path d="M24 38V22" stroke="currentColor" stroke-width="4"></path></svg></div>
+                    <div class="flex flex-col gap-4 rounded-xl border bg-white dark:bg-neutral-dark shadow-sm p-8">
                         <div class="text-center">
-                            <h1 class="text-3xl font-bold">Welcome</h1>
-                            <p class="text-gray-600 mt-2">Enter your email to receive a login code.</p>
+                            <h1 class="text-3xl font-bold text-text-light-primary dark:text-text-dark-primary">Welcome</h1>
+                            <p class="text-gray-600 dark:text-text-dark-secondary mt-2">Enter your email to receive a login code.</p>
                         </div>
                         <form @submit.prevent="sendOtp" class="flex flex-col gap-6 mt-4">
-                            <label class="flex flex-col"><p class="pb-2 text-base font-medium">Email</p><input v-model="email" type="email" class="form-input h-14 rounded-lg border px-3" placeholder="Enter your email address" required></label>
-                            <button type="submit" class="h-14 rounded-lg bg-[#137fec] text-white font-medium hover:bg-opacity-90">Get Login Code</button>
+                            <label class="flex flex-col"><p class="pb-2 text-base font-medium text-text-light-primary dark:text-text-dark-primary">Email</p><input v-model="email" type="email" class="form-input h-14 rounded-lg border-border-light dark:border-border-dark bg-neutral-light dark:bg-neutral-dark/30 px-3 text-text-light-primary dark:text-text-dark-primary" placeholder="Enter your email address" required></label>
+                            <button type="submit" class="h-14 rounded-lg bg-primary text-white font-medium hover:bg-opacity-90">Get Login Code</button>
                         </form>
                     </div>
                 </div>
 
                 <!-- OTP Modal -->
-                <div v-if="otpSent" class="relative flex w-full max-w-md flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+                <div v-if="otpSent" class="relative flex w-full max-w-md flex-col overflow-hidden rounded-xl bg-white dark:bg-neutral-dark shadow-2xl">
                      <div class="flex flex-col items-center justify-center p-8 sm:p-10">
-                        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-[#137fec]"><span class="material-symbols-outlined text-4xl">shield</span></div>
-                        <h1 class="text-2xl font-bold text-center pb-2">Verify Your Identity</h1>
-                        <p class="text-gray-600 text-sm text-center pb-6">We've sent a verification code to <strong>{{ email }}</strong>.</p>
+                        <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary"><span class="material-symbols-outlined text-4xl">shield</span></div>
+                        <h1 class="text-2xl font-bold text-center pb-2 text-text-light-primary dark:text-text-dark-primary">Verify Your Identity</h1>
+                        <p class="text-gray-600 dark:text-text-dark-secondary text-sm text-center pb-6">We've sent a verification code to <strong>{{ email }}</strong>.</p>
                         <form @submit.prevent="verifyOtp" class="flex flex-col gap-6 w-full">
                             <div class="flex justify-center gap-2">
-                                <input v-for="(digit, index) in otp" :key="index" v-model="otp[index]" type="text" maxlength="1" @input="handleOtpInput(index, $event)" ref="otpInputs" class="h-14 w-12 text-center text-2xl font-bold rounded-lg border focus:border-[#137fec] focus:ring-2 focus:ring-[#137fec]/50">
+                                <input v-for="(digit, index) in otp" :key="index" v-model="otp[index]" type="text" maxlength="1" @input="handleOtpInput(index, $event)" ref="otpInputs" class="h-14 w-12 text-center text-2xl font-bold rounded-lg border-border-light dark:border-border-dark bg-neutral-light dark:bg-neutral-dark/30 focus:border-primary focus:ring-2 focus:ring-primary/50 text-text-light-primary dark:text-text-dark-primary">
                             </div>
-                            <button type="submit" class="h-14 rounded-lg bg-[#137fec] text-white font-medium hover:bg-opacity-90">Verify & Login</button>
+                            <button type="submit" class="h-14 rounded-lg bg-primary text-white font-medium hover:bg-opacity-90">Verify & Login</button>
                         </form>
                     </div>
                 </div>
@@ -69,7 +112,6 @@
 
             const sendOtp = () => {
                 if (email.value) {
-                    console.log('Sending OTP to', email.value);
                     otpSent.value = true;
                 }
             };
@@ -77,9 +119,12 @@
             const verifyOtp = () => {
                 const code = otp.value.join('');
                 if (code.length === 6) {
-                    console.log('Verifying OTP', code);
                     // Mock verification
-                    emit('login-success');
+                    if (email.value.includes('admin')) {
+                        emit('login-success', 'admin');
+                    } else {
+                        emit('login-success', 'user');
+                    }
                 } else {
                     alert('Please enter the 6-digit code.');
                 }
@@ -96,44 +141,111 @@
         }
     };
 
-    // Screen 2: Dashboard View
-    const DashboardComponent = {
+    // User Dashboard Component (Screen 4)
+    const UserDashboardComponent = {
         template: `
-            <div class="relative flex min-h-screen w-full">
+            <div class="relative flex min-h-screen w-full flex-row">
                 <!-- SideNavBar -->
-                <aside class="flex h-screen w-64 flex-col border-r bg-white sticky top-0">
-                    <div class="flex h-16 items-center gap-3 px-6 border-b">
-                        <svg class="size-8 text-[#4A90E2]" fill="none" viewBox="0 0 48 48"><path d="M39.5 34.1V13.8C39.5 15.7 36.8 17.3 32.7 18.3C30.2 18.9 27.2 19.2 24 19.2S17.7 18.9 15.2 18.3C11.1 17.3 8.4 15.7 8.4 13.8V34.1C8.4 36 11.1 37.6 15.2 38.6C17.7 39.2 20.7 39.5 24 39.5S30.2 39.2 32.7 38.6C36.8 37.6 39.5 36 39.5 34.1Z" fill="currentColor"></path></svg>
-                        <h2 class="text-lg font-bold">Machine Manager</h2>
-                    </div>
-                    <div class="flex flex-1 flex-col justify-between p-4">
-                        <nav class="flex flex-col gap-2">
-                            <a href="#" class="flex items-center gap-3 rounded-lg bg-primary/20 px-3 py-2 text-[#4A90E2]"><span class="material-symbols-outlined">dashboard</span><p>Dashboard</p></a>
-                            <!-- Add other nav links as needed -->
-                        </nav>
-                        <a @click="$emit('logout')" href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-black/5"><span class="material-symbols-outlined">logout</span><p>Logout</p></a>
+                <aside class="flex h-screen min-h-screen flex-col border-r border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-neutral-dark sticky top-0 w-64 shrink-0">
+                    <div class="flex h-full flex-col justify-between">
+                        <div class="flex flex-col gap-6">
+                            <div class="flex items-center gap-3 px-3">
+                                <span class="material-symbols-outlined text-primary text-3xl">deployed_code</span>
+                                <h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">MachineCorp</h2>
+                            </div>
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center gap-3 px-3">
+                                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" :style="{ 'background-image': 'url(' + user.avatar + ')' }"></div>
+                                    <div class="flex flex-col">
+                                        <h1 class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal">{{ user.name }}</h1>
+                                        <p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">Staff</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <a class="flex items-center gap-3 rounded-lg bg-primary/20 px-3 py-2 text-primary dark:bg-primary/30" href="#">
+                                        <span class="material-symbols-outlined text-primary">dashboard</span>
+                                        <p class="text-sm font-medium leading-normal">Dashboard</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <a @click="$emit('logout')" href="#" class="flex items-center gap-3 rounded-lg px-3 py-2 text-text-light-secondary hover:bg-black/5 dark:text-text-dark-secondary dark:hover:bg-white/5">
+                                <span class="material-symbols-outlined">logout</span>
+                                <p class="text-sm font-medium leading-normal">Log Out</p>
+                            </a>
+                        </div>
                     </div>
                 </aside>
-                <main class="flex-1">
-                    <header class="flex items-center justify-end border-b px-8 py-3 sticky top-0 bg-white/80 backdrop-blur-sm z-10">
-                        <button class="h-10 px-4 rounded-lg bg-[#4A90E2] text-white text-sm font-bold shadow-sm hover:bg-opacity-90">Request Service</button>
-                    </header>
-                    <div class="p-8">
-                        <div class="mx-auto max-w-7xl">
-                            <h1 class="text-3xl font-bold mb-8">My Machines Dashboard</h1>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                <div class="rounded-lg p-6 border bg-white"><p>Total Machines</p><p class="text-4xl font-bold">3</p></div>
-                                <div class="rounded-lg p-6 border bg-white"><p>Active Machines</p><p class="text-4xl font-bold">1</p></div>
-                                <div class="rounded-lg p-6 border bg-white"><p>Machines with Alerts</p><p class="text-4xl font-bold text-amber-500">1</p></div>
+                <!-- Main Content -->
+                <main class="flex-1 p-8 bg-background-light dark:bg-background-dark">
+                    <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
+                        <!-- PageHeading -->
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <h1 class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold tracking-tight">My Assigned Machines</h1>
+                            <button class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal transition-colors hover:bg-primary/90">
+                                <span class="material-symbols-outlined text-lg">add</span>
+                                <span class="truncate">Add New Machine</span>
+                            </button>
+                        </div>
+                        <div class="flex flex-col gap-4 rounded-xl border border-border-light dark:border-border-dark bg-neutral-light dark:bg-neutral-dark/50 p-4">
+                            <!-- Search and Filters -->
+                            <div class="flex flex-col gap-4 md:flex-row md:items-center">
+                                <!-- SearchBar -->
+                                <div class="flex-1">
+                                    <label class="flex h-12 w-full flex-col">
+                                        <div class="flex w-full flex-1 items-stretch rounded-lg">
+                                            <div class="flex items-center justify-center rounded-l-lg border border-r-0 border-border-light dark:border-border-dark bg-neutral-light/50 dark:bg-neutral-dark/20 pl-4 text-text-light-secondary dark:text-text-dark-secondary">
+                                                <span class="material-symbols-outlined">search</span>
+                                            </div>
+                                            <input v-model="searchQuery" class="form-input h-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg border border-l-0 border-border-light dark:border-border-dark bg-neutral-light dark:bg-neutral-dark/30 px-4 text-base font-normal leading-normal text-text-light-primary dark:text-text-dark-primary placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary focus:border-primary focus:outline-0 focus:ring-0" placeholder="Search by name or serial...">
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="flex flex-wrap gap-3">
+                                    <select v-model="statusFilter" class="form-select h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark pl-4 pr-3 text-text-light-primary dark:text-text-dark-primary">
+                                        <option value="">Status: All</option>
+                                        <option value="Online">Online</option>
+                                        <option value="Offline">Offline</option>
+                                        <option value="Warning">Warning</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                    </select>
+                                    <select v-model="typeFilter" class="form-select h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark pl-4 pr-3 text-text-light-primary dark:text-text-dark-primary">
+                                        <option value="">Type: All</option>
+                                        <option value="Type A">Type A</option>
+                                        <option value="Type B">Type B</option>
+                                        <option value="Type C">Type C</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="overflow-x-auto rounded-lg border bg-white">
+                            <!-- Table -->
+                            <div class="overflow-x-auto">
                                 <table class="w-full text-left">
-                                    <thead><tr class="bg-gray-50"><th class="p-4">Machine Name</th><th>Status</th><th>Actions</th></tr></thead>
+                                    <thead>
+                                        <tr class="border-b border-border-light dark:border-border-dark">
+                                            <th class="cursor-pointer p-4 text-left text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Machine Name</th>
+                                            <th class="cursor-pointer p-4 text-left text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Serial Number</th>
+                                            <th class="cursor-pointer p-4 text-left text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Status</th>
+                                            <th class="cursor-pointer p-4 text-left text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Last Check-in</th>
+                                            <th class="p-4 text-left text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Actions</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        <tr v-for="machine in machines" :key="machine.id" class="border-t">
-                                            <td class="p-4 font-semibold">{{ machine.name }}</td>
-                                            <td><span :class="statusClass(machine.status)">{{ machine.status }}</span></td>
-                                            <td><button @click="$emit('view-details', machine)" class="text-sm font-semibold text-[#4A90E2] hover:underline">View Details</button></td>
+                                        <tr v-for="machine in filteredMachines" :key="machine.id" class="border-b border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-neutral-dark/50">
+                                            <td class="p-4 align-middle text-sm font-medium text-text-light-primary dark:text-text-dark-primary">{{ machine.name }}</td>
+                                            <td class="p-4 align-middle text-sm text-text-light-secondary dark:text-text-dark-secondary">{{ machine.serial }}</td>
+                                            <td class="p-4 align-middle">
+                                                <div class="flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium w-fit" :class="statusClass(machine.status).badge">
+                                                    <span class="h-2 w-2 rounded-full" :class="statusClass(machine.status).dot"></span>
+                                                    <span>{{ machine.status }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="p-4 align-middle text-sm text-text-light-secondary dark:text-text-dark-secondary">{{ machine.lastCheckin }}</td>
+                                            <td class="p-4 align-middle">
+                                                <button @click="$emit('view-details', machine)" class="flex h-8 w-8 items-center justify-center rounded-lg text-text-light-secondary hover:bg-stone-200 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200">
+                                                    <span class="material-symbols-outlined text-xl">visibility</span>
+                                                </button>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -143,35 +255,67 @@
                 </main>
             </div>
         `,
-        props: ['machines'],
-        setup() {
+        props: ['machines', 'user'],
+        setup(props) {
+            const searchQuery = ref('');
+            const statusFilter = ref('');
+            const typeFilter = ref('');
+
+            const filteredMachines = computed(() => {
+                let filtered = props.machines;
+
+                if (searchQuery.value) {
+                    const lowerCaseQuery = searchQuery.value.toLowerCase();
+                    filtered = filtered.filter(machine =>
+                        machine.name.toLowerCase().includes(lowerCaseQuery) ||
+                        machine.serial.toLowerCase().includes(lowerCaseQuery)
+                    );
+                }
+
+                if (statusFilter.value) {
+                    filtered = filtered.filter(machine => machine.status === statusFilter.value);
+                }
+
+                if (typeFilter.value) {
+                    filtered = filtered.filter(machine => machine.type === typeFilter.value);
+                }
+
+                return filtered;
+            });
+
             const statusClass = (status) => {
                 switch (status) {
-                    case 'Online': return 'bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium';
-                    case 'Offline': return 'bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-medium';
-                    case 'Warning': return 'bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-medium';
-                    default: return 'bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium';
+                    case 'Online': return { badge: 'bg-green-500/10 text-green-500 dark:bg-green-500/20', dot: 'bg-green-500' };
+                    case 'Offline': return { badge: 'bg-red-500/10 text-red-500 dark:bg-red-500/20', dot: 'bg-red-500' };
+                    case 'Warning': return { badge: 'bg-yellow-500/10 text-yellow-500 dark:bg-yellow-500/20', dot: 'bg-yellow-500' };
+                    case 'Maintenance': return { badge: 'bg-gray-500/10 text-gray-500 dark:bg-gray-500/20', dot: 'bg-gray-500' };
+                    default: return { badge: 'bg-gray-500/10 text-gray-500 dark:bg-gray-500/20', dot: 'bg-gray-500' };
                 }
             };
-            return { statusClass };
+
+            return { searchQuery, statusFilter, typeFilter, filteredMachines, statusClass };
         }
     };
 
-    // Screen 3: Details View
-    const DetailsComponent = {
+    // Machine Details Component
+    const MachineDetailsComponent = {
         template: `
             <div class="relative flex min-h-screen w-full">
-                 <!-- SideNavBar (consistent with dashboard) -->
-                <aside class="flex h-screen w-64 flex-col border-r bg-white sticky top-0"><div class="flex h-16 items-center gap-3 px-6 border-b"><h2 class="text-lg font-bold">Machine Manager</h2></div><div class="p-4"><a href="#" @click="$emit('back-to-dashboard')" class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 hover:bg-black/5"><span class="material-symbols-outlined">arrow_back</span><p>Back to Dashboard</p></a></div></aside>
-                <main class="flex-1 p-8">
+                 <aside class="flex h-screen w-64 flex-col border-r bg-white dark:bg-neutral-dark sticky top-0"><div class="flex h-16 items-center gap-3 px-6 border-b border-border-light dark:border-border-dark"><h2 class="text-lg font-bold text-text-light-primary dark:text-text-dark-primary">Machine Manager</h2></div><div class="p-4"><a href="#" @click="$emit('back-to-dashboard')" class="flex items-center gap-3 rounded-lg px-3 py-2 text-text-light-secondary dark:text-text-dark-secondary hover:bg-black/5 dark:hover:bg-white/5"><span class="material-symbols-outlined">arrow_back</span><p>Back to Dashboard</p></a></div></aside>
+                <main class="flex-1 p-8 bg-background-light dark:bg-background-dark">
                     <div class="max-w-4xl mx-auto">
-                        <h1 class="text-3xl font-bold mb-8">Machine Details: {{ machine.name }}</h1>
-                        <div class="bg-white rounded-xl shadow-sm border p-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><p class="font-medium">Asset ID</p><p>{{ machine.details.assetId }}</p></div>
-                                <div><p class="font-medium">Serial Number</p><p>{{ machine.details.serial }}</p></div>
-                                <div><p class="font-medium">Operating Temperature</p><p>{{ machine.details.temp }}°C</p></div>
-                                <div><p class="font-medium">Status</p><p>{{ machine.details.status }}</p></div>
+                        <h1 class="text-3xl font-bold mb-8 text-text-light-primary dark:text-text-dark-primary">Machine Details: {{ machine.name }}</h1>
+                        <div class="bg-white dark:bg-neutral-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-text-light-primary dark:text-text-dark-primary">
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Asset ID</p><p>{{ machine.assetId }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Serial Number</p><p>{{ machine.serial }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Operating Temperature</p><p>{{ machine.temp }}°C</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Status</p><p>{{ machine.status }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Location</p><p>{{ machine.location }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Last Check-in</p><p>{{ machine.lastCheckin }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Last Serviced</p><p>{{ machine.lastServiced }}</p></div>
+                                <div><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Department</p><p>{{ machine.department }}</p></div>
+                                <div class="md:col-span-2"><p class="font-medium text-text-light-secondary dark:text-text-dark-secondary">Notes</p><p>{{ machine.notes || 'N/A' }}</p></div>
                             </div>
                         </div>
                     </div>
@@ -181,20 +325,271 @@
         props: ['machine']
     };
 
+    // Admin Dashboard Component (Screen 3)
+    const AdminDashboardComponent = {
+        template: `
+            <div class="flex h-screen">
+                <!-- SideNavBar -->
+                <aside class="flex w-64 flex-col bg-neutral-light dark:bg-neutral-dark border-r border-border-light dark:border-border-dark">
+                    <div class="flex flex-col gap-4 p-4 h-full">
+                        <div class="flex gap-3 items-center px-2 py-4">
+                            <div class="bg-primary/20 text-primary p-2 rounded-lg">
+                                <span class="material-symbols-outlined">directions_car</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <h1 class="text-text-light-primary dark:text-text-dark-primary text-base font-bold leading-normal">Machine Fleet</h1>
+                                <p class="text-text-light-secondary dark:text-text-dark-secondary text-sm font-normal leading-normal">Management</p>
+                            </div>
+                        </div>
+                        <nav class="flex flex-col gap-2 flex-grow">
+                            <a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT bg-primary/20 text-primary" href="#">
+                                <span class="material-symbols-outlined">dashboard</span>
+                                <p class="text-sm font-medium leading-normal">Dashboard</p>
+                            </a>
+                        </nav>
+                        <div class="flex flex-col gap-1">
+                            <a @click="$emit('logout')" href="#" class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT hover:bg-black/5 dark:hover:bg-white/5">
+                                <span class="material-symbols-outlined">logout</span>
+                                <p class="text-sm font-medium leading-normal">Logout</p>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+                <!-- Main Content -->
+                <div class="flex flex-1 flex-col overflow-y-auto">
+                    <!-- TopNavBar -->
+                    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark px-10 py-3 bg-neutral-light dark:bg-neutral-dark sticky top-0 z-10">
+                        <div class="flex items-center gap-8">
+                            <label class="relative flex flex-col min-w-40 w-96">
+                                <div class="flex w-full flex-1 items-stretch rounded-DEFAULT h-10">
+                                    <div class="text-text-light-secondary dark:text-text-dark-secondary flex items-center justify-center pl-4">
+                                        <span class="material-symbols-outlined">search</span>
+                                    </div>
+                                    <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-DEFAULT text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-2 focus:ring-primary/50 border-none bg-neutral-light dark:bg-neutral-dark h-full placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary pl-2 text-base font-normal leading-normal" placeholder="Search for machines or users...">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex flex-1 justify-end gap-4 items-center">
+                             <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" :style="{'background-image': 'url(' + user.avatar + ')'}"></div>
+                        </div>
+                    </header>
+                    <main class="flex-1 p-8">
+                        <!-- PageHeading -->
+                        <div class="flex flex-wrap justify-between gap-3 mb-6">
+                            <h1 class="text-text-light-primary dark:text-text-dark-primary text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Dashboard Overview</h1>
+                        </div>
+                        <!-- Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-neutral-light dark:bg-neutral-dark border border-border-light dark:border-border-dark">
+                                <p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal">Total Machines</p>
+                                <p class="text-text-light-primary dark:text-text-dark-primary tracking-light text-3xl font-bold leading-tight">{{ machines.length }}</p>
+                            </div>
+                            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-neutral-light dark:bg-neutral-dark border border-border-light dark:border-border-dark">
+                                <p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal">Available Machines</p>
+                                <p class="text-text-light-primary dark:text-text-dark-primary tracking-light text-3xl font-bold leading-tight">{{ availableMachines }}</p>
+                            </div>
+                            <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-neutral-light dark:bg-neutral-dark border border-border-light dark:border-border-dark">
+                                <p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal">Active Users</p>
+                                <p class="text-text-light-primary dark:text-text-dark-primary tracking-light text-3xl font-bold leading-tight">{{ users.length }}</p>
+                            </div>
+                        </div>
+                        <!-- Table -->
+                        <div class="bg-neutral-light dark:bg-neutral-dark rounded-lg border border-border-light dark:border-border-dark">
+                            <div class="p-6">
+                                <div class="flex flex-col gap-4">
+                                    <div class="flex justify-between items-center">
+                                        <h2 class="text-xl font-bold text-text-light-primary dark:text-text-dark-primary">Manage Machines</h2>
+                                        <button @click="$emit('add-machine')" class="bg-primary text-white px-4 py-2 rounded-DEFAULT text-sm font-bold flex items-center gap-2 hover:opacity-90">
+                                            <span class="material-symbols-outlined text-base">add_circle</span>
+                                            Add Machine
+                                        </button>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left">
+                                            <thead class="bg-background-light dark:bg-neutral-dark/50 text-xs text-text-light-secondary dark:text-text-dark-secondary uppercase">
+                                                <tr>
+                                                    <th class="px-6 py-3" scope="col"><input class="form-checkbox rounded border-slate-300 dark:border-slate-600 bg-card-light dark:bg-card-dark text-primary focus:ring-primary/50" type="checkbox"/></th>
+                                                    <th class="px-6 py-3" scope="col">Machine Name</th>
+                                                    <th class="px-6 py-3" scope="col">Status</th>
+                                                    <th class="px-6 py-3" scope="col">Assigned To</th>
+                                                    <th class="px-6 py-3" scope="col">Last Activity</th>
+                                                    <th class="px-6 py-3" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-sm">
+                                                <tr v-for="machine in machines" :key="machine.id" class="border-b border-border-light dark:border-border-dark">
+                                                    <td class="px-6 py-4"><input class="form-checkbox rounded border-slate-300 dark:border-slate-600 bg-card-light dark:bg-card-dark text-primary focus:ring-primary/50" type="checkbox"/></td>
+                                                    <td class="px-6 py-4 font-medium">{{ machine.name }}</td>
+                                                    <td class="px-6 py-4"><span class="text-xs font-medium px-2.5 py-0.5 rounded-full" :class="statusClass(machine.status).badge">{{ machine.status }}</span></td>
+                                                    <td class="px-6 py-4">{{ machine.assignedTo || '-' }}</td>
+                                                    <td class="px-6 py-4">{{ machine.lastCheckin }}</td>
+                                                    <td class="px-6 py-4 flex gap-2">
+                                                        <button @click="$emit('edit-machine', machine)" class="text-slate-500 dark:text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-xl">edit</span></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        `,
+        props: ['machines', 'users', 'user'],
+        setup(props) {
+            const availableMachines = computed(() => props.machines.filter(m => m.status === 'Online').length);
+
+            const statusClass = (status) => {
+                switch (status) {
+                    case 'Online': return { badge: 'bg-success/20 text-success' };
+                    case 'Offline': return { badge: 'bg-error/20 text-error' };
+                    case 'Warning': return { badge: 'bg-warning/20 text-warning' };
+                    case 'Maintenance': return { badge: 'bg-primary/20 text-primary' };
+                    default: return { badge: 'bg-gray-500/20 text-gray-500' };
+                }
+            };
+
+            return { availableMachines, statusClass };
+        }
+    };
+
+    // Edit Machine Component (Screen 2)
+    const EditMachineComponent = {
+        template: `
+            <div class="flex min-h-screen">
+                <!-- SideNavBar -->
+                <aside class="w-64 flex-shrink-0 bg-white dark:bg-neutral-dark border-r border-border-light dark:border-border-dark p-4">
+                    <div class="flex flex-col h-full">
+                        <nav class="flex flex-col gap-2">
+                            <a @click="$emit('cancel-edit')" href="#" class="flex items-center gap-3 px-3 py-2 text-text-light-primary dark:text-text-dark-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                                <p class="text-sm font-medium leading-normal">Back to Dashboard</p>
+                            </a>
+                        </nav>
+                    </div>
+                </aside>
+                <!-- Main Content -->
+                <main class="flex-1 p-6 md:p-8 lg:p-10 bg-background-light dark:bg-background-dark">
+                    <div class="max-w-4xl mx-auto">
+                        <!-- PageHeading -->
+                        <div class="flex flex-wrap justify-between gap-3 mb-8">
+                            <h1 class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight">Edit {{ machine.name }}</h1>
+                        </div>
+                        <!-- Form Container -->
+                        <div class="bg-white dark:bg-neutral-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark p-6 md:p-8">
+                            <form @submit.prevent="save" class="space-y-8">
+                                <!-- Machine Identification Section -->
+                                <div>
+                                    <h3 class="text-text-light-primary dark:text-text-dark-primary text-lg font-bold leading-tight tracking-tight mb-4">Machine Identification</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Machine Name</p>
+                                            <input v-model="editableMachine.name" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                        </label>
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Asset ID</p>
+                                            <input v-model="editableMachine.assetId" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                        </label>
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Serial Number (Read-only)</p>
+                                            <input :value="editableMachine.serial" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-secondary dark:text-text-dark-secondary focus:outline-0 focus:ring-0 border border-border-light dark:border-border-dark bg-background-light dark:bg-neutral-dark/50 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal cursor-not-allowed" readonly/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- Status & Configuration Section -->
+                                <div>
+                                    <h3 class="text-text-light-primary dark:text-text-dark-primary text-lg font-bold leading-tight tracking-tight mb-4">Status & Configuration</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Current Status</p>
+                                            <select v-model="editableMachine.status" class="form-select flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal">
+                                                <option>Online</option>
+                                                <option>Offline</option>
+                                                <option>Warning</option>
+                                                <option>Maintenance</option>
+                                            </select>
+                                        </label>
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Last Serviced Date</p>
+                                            <input v-model="editableMachine.lastServiced" type="date" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                        </label>
+                                        <div class="md:col-span-2">
+                                            <label class="flex flex-col">
+                                                <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Operating Temperature (°C)</p>
+                                                <input v-model="editableMachine.temp" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Location Information Section -->
+                                <div>
+                                    <h3 class="text-text-light-primary dark:text-text-dark-primary text-lg font-bold leading-tight tracking-tight mb-4">Location Information</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Physical Location</p>
+                                            <input v-model="editableMachine.location" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                        </label>
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Assigned Department</p>
+                                            <input v-model="editableMachine.department" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 h-11 placeholder:text-secondary px-3 text-sm font-normal leading-normal"/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- Notes Section -->
+                                <div>
+                                    <h3 class="text-text-light-primary dark:text-text-dark-primary text-lg font-bold leading-tight tracking-tight mb-4">Notes & History</h3>
+                                    <div>
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light-primary dark:text-text-dark-primary text-sm font-medium leading-normal pb-2">Maintenance Notes</p>
+                                            <textarea v-model="editableMachine.notes" class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg text-text-light-primary dark:text-text-dark-primary focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-white dark:bg-neutral-dark/30 min-h-32 placeholder:text-secondary p-3 text-sm font-normal leading-normal"></textarea>
+                                        </label>
+                                    </div>
+                                </div>
+                                <!-- Action Area -->
+                                <div class="flex items-center justify-end gap-4 mt-10 pt-6 border-t border-border-light dark:border-border-dark">
+                                    <button @click="$emit('cancel-edit')" type="button" class="px-4 py-2 text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary bg-white dark:bg-neutral-dark/50 border border-border-light dark:border-border-dark rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">Cancel</button>
+                                    <button type="submit" class="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-lg shadow-sm hover:bg-primary/90">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        `,
+        props: ['machine'],
+        setup(props, { emit }) {
+            const editableMachine = ref(JSON.parse(JSON.stringify(props.machine)));
+
+            const save = () => {
+                emit('save-machine', editableMachine.value);
+            };
+
+            return { editableMachine, save };
+        }
+    };
 
     // --- Main App ---
     const app = createApp({
         setup() {
-            const currentView = ref('login'); // or 'dashboard', 'details'
+            const currentView = ref('login'); // login, user-dashboard, admin-dashboard, edit-machine, user-details
+            const userRole = ref('user'); // user, admin
             const machines = ref(mockMachines);
+            const users = ref(mockUsers);
             const selectedMachine = ref(null);
+            const currentUser = ref(users.value[0]);
 
             const viewComponent = computed(() => {
                 switch (currentView.value) {
-                    case 'dashboard':
-                        return DashboardComponent;
-                    case 'details':
-                        return DetailsComponent;
+                    case 'user-dashboard':
+                        return UserDashboardComponent;
+                    case 'admin-dashboard':
+                        return AdminDashboardComponent;
+                    case 'edit-machine':
+                        return EditMachineComponent;
+                    case 'user-details':
+                        return MachineDetailsComponent;
                     default:
                         return OtpLoginComponent;
                 }
@@ -202,44 +597,83 @@
 
             const currentProps = computed(() => {
                 switch (currentView.value) {
-                    case 'dashboard':
-                        return { machines: machines.value };
-                    case 'details':
+                    case 'user-dashboard':
+                        return { machines: machines.value, user: currentUser.value };
+                    case 'admin-dashboard':
+                        return { machines: machines.value, users: users.value, user: currentUser.value };
+                    case 'edit-machine':
+                        return { machine: selectedMachine.value };
+                    case 'user-details':
                         return { machine: selectedMachine.value };
                     default:
                         return {};
                 }
             });
 
-            const showDashboard = () => {
-                currentView.value = 'dashboard';
+            const login = (role) => {
+                userRole.value = role;
+                if (role === 'admin') {
+                    currentUser.value = users.value[1];
+                    currentView.value = 'admin-dashboard';
+                } else {
+                    currentUser.value = users.value[0];
+                    currentView.value = 'user-dashboard';
+                }
             };
 
-            const showDetails = (machine) => {
+            const editMachine = (machine) => {
                 selectedMachine.value = machine;
-                currentView.value = 'details';
+                currentView.value = 'edit-machine';
+            };
+
+            const saveMachine = (updatedMachine) => {
+                const index = machines.value.findIndex(m => m.id === updatedMachine.id);
+                if (index !== -1) {
+                    machines.value[index] = updatedMachine;
+                }
+                currentView.value = 'admin-dashboard';
+            };
+
+            const cancelEdit = () => {
+                currentView.value = 'admin-dashboard';
             };
 
             const logout = () => {
                 currentView.value = 'login';
             };
 
+            const viewDetails = (machine) => {
+                selectedMachine.value = machine;
+                currentView.value = 'user-details';
+            };
+
+            const backToDashboard = () => {
+                currentView.value = 'user-dashboard';
+            };
+
             return {
                 viewComponent,
                 currentProps,
-                showDashboard,
-                showDetails,
+                login,
+                editMachine,
+                saveMachine,
+                cancelEdit,
                 logout,
+                viewDetails,
+                backToDashboard,
             };
         },
         template: `
             <component
                 :is="viewComponent"
                 v-bind="currentProps"
-                @login-success="showDashboard"
-                @view-details="showDetails"
-                @back-to-dashboard="showDashboard"
+                @login-success="login"
+                @edit-machine="editMachine"
+                @save-machine="saveMachine"
+                @cancel-edit="cancelEdit"
                 @logout="logout"
+                @view-details="viewDetails"
+                @back-to-dashboard="backToDashboard"
             />
         `
     });
