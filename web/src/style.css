@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --color-primary: #4C83FF;
+  --color-primary-light: #E0ECFF;
+  --color-primary-dark: #3667CC;
+  --color-background-light: #F2F7FF;
+  --color-background-dark: #1A202C;
+  --color-neutral-light: #FFFFFF;
+  --color-neutral-dark: #2D3748;
+  --color-text-primary: #2D3748;
+  --color-text-secondary: #6B7280;
+  --color-border-light: #D1D5DB;
+  --color-border-dark: #4A5568;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.fill {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
